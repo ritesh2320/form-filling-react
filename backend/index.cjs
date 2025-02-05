@@ -1,26 +1,32 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
-app.use(express.json());
-app.use(cors());
-
-async function main() {
-  await mongoose.connect("mongodb://localhost:27017/users");
-}
+const path = require("path");
+const User = require("../models/users.cjs");
 
 main()
   .then(() => {
-    console.log("Connection successful");
+    console.log("database connected");
   })
-  .catch((err) => {
-    console.log(err);
-  });
+  .catch((err) => console.log(err));
 
-app.post("/postData", (req, res));
+async function main() {
+  await mongoose.connect("mongodb://127.0.0.1:27017/users");
+}
 
-app.get("/getData", (req, res) => {
-  res.send("hello");
+app.post("/postData", async (req, res) => {
+  try {
+    console.log(req.body);
+    const data = req.body;
+    let newUser = new User(data);
+    await newUser.save();
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get("/", (req, res) => {
+  res.send("root user");
 });
 
 app.listen(8080, () => {
